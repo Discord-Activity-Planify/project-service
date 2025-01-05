@@ -1,0 +1,21 @@
+{
+  "name": "project-service",
+  "version": "1.0.0",
+  "description": "this is service that provided apis for project data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2",
+    "sequelize": "^6.37.5",
+    "wait-port": "^1.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.2"
+  }
+}
