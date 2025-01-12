@@ -154,6 +154,8 @@ const editProject = async (req: Request, res: Response) => {
         } catch (error) {
             res.status(500).json({ error: 'Error editing project' });
         }
+    } else {
+        res.status(400).json({ error: 'Project ID is required' });
     }
 }
 
@@ -174,6 +176,8 @@ const deleteProject = async (req: Request, res: Response) => {
         } catch (error) {
             res.status(500).json({ error: 'Error deleting project' });
         }
+    } else {
+        res.status(400).json({ error: 'Project ID is required' });
     }
 }
 
