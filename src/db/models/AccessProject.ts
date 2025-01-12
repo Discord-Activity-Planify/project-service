@@ -16,5 +16,8 @@ export const AccessProject = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: true
         }
+    },
+    {
+        timestamps: false
     }
 )

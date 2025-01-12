@@ -21,5 +21,8 @@ export const File = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false
         }
+    },
+    {
+        timestamps: false
     }
 )

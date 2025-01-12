@@ -21,5 +21,8 @@ export const Assign = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         }
+    },
+    {
+        timestamps: false
     }
 )

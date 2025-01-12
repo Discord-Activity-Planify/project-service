@@ -29,5 +29,8 @@ export const List = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: true
         }
+    },
+    {
+        timestamps: false
     }
 )

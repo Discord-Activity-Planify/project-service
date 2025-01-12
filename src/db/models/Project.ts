@@ -20,5 +20,8 @@ export const Project = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: true
         }
+    },
+    {
+        timestamps: false
     }
 )

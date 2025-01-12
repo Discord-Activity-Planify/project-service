@@ -16,5 +16,8 @@ export const Acknowledgement = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false
         }
+    },
+    {
+        timestamps: false
     }
 )

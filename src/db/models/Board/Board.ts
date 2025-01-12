@@ -24,5 +24,8 @@ export const Board = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: true
         }
+    },
+    {
+        timestamps: false
     }
 )

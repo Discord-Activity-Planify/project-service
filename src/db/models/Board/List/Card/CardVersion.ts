@@ -49,5 +49,8 @@ export const CardVersion = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false
         },
+    },
+    {
+        timestamps: false
     }
 )
