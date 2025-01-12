@@ -40,6 +40,10 @@ export const Card = sequelize.define(
         isActive: {
             type: DataTypes.BOOLEAN,
             defaultValue: true
+        },
+        order: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     }
 )
