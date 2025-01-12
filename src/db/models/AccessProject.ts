@@ -11,6 +11,10 @@ export const AccessProject = sequelize.define(
         projectId: {
             type: DataTypes.INTEGER,
             primaryKey: true
+        },
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
         }
     }
 )
