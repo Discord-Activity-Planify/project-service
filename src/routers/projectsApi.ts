@@ -14,7 +14,7 @@ router.use("/:projectId/boards/:boardId/lists", authorizeProjectAccess, listsApi
 router.use("/:projectId/boards/:boardId/lists/:listId/cards", authorizeProjectAccess, cardsApi)
 router.use("/:projectId/boards/:boardId/lists/:listId/cards/:cardId/histories", authorizeProjectAccess, cardHistoriesApi)
 router.use("/:projectId/members", authorizeProjectAccess, membersApi)
-router.use("/:projectId", authorizeProjectAccess, invitationsApi)
+router.use("/:projectId/invite", authorizeProjectAccess, invitationsApi)
 
 router.get("/:projectId", authorizeProjectAccess, getProject)
 router.get("/", getProjects) // ? query page, limit
