@@ -20,7 +20,7 @@ async function main(): Promise<void> {
 
     // api/v1
     app.use('/api/v1/projects', projectsApi)
-    app.use('api/v1/styles', stylesApi)
+    app.use('/api/v1/styles', stylesApi)
 
     app.listen(port, () => console.log(`Server is running on http://${host}:${port}`))
 }
