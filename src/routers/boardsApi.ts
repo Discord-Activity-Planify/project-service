@@ -1,7 +1,7 @@
 import express from "express";
 import { getBoard, getBoards, createBoard, editBoard, deleteBoard } from "../controllers/boardsController";
 
-const router = express.Router()
+const router = express.Router({mergeParams: true})
 
 router.get("/:boardId", getBoard)
 router.get("/", getBoards) // ? query page, limit

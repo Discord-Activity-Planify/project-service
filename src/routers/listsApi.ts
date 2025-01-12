@@ -1,7 +1,7 @@
 import express from "express";
 import { getList, getLists, createList, editList, deleteList } from "../controllers/listsController";
 
-const router = express.Router()
+const router = express.Router({mergeParams: true})
 
 router.get("/:listId", getList)
 router.get("/", getLists) // ? query page, limit

@@ -1,7 +1,7 @@
 import express from "express";
 import { getCard, getCards, createCard, editCard, deleteCard } from "../controllers/cardsController";
 
-const router = express.Router()
+const router = express.Router({mergeParams: true})
 
 router.get("/:cardId", getCard)
 router.get("/", getCards) // ? query page, limit
