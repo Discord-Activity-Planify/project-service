@@ -13,6 +13,14 @@ export const Card = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        projectId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        boardId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         versionNumber: {
             type: DataTypes.INTEGER,
             allowNull: false

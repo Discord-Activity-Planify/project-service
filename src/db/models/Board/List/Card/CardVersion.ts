@@ -4,13 +4,21 @@ import { DataTypes } from "sequelize";
 export const CardVersion = sequelize.define(
     "CardVersions",
     {
+        versionNumber: {
+            type: DataTypes.INTEGER,
+            primaryKey: true
+        },
         cardId: {
             type: DataTypes.INTEGER,
             primaryKey: true
         },
-        versionNumber: {
+        projectId: {
             type: DataTypes.INTEGER,
-            primaryKey: true
+            allowNull: false
+        },
+        boardId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
         name: {
             type: DataTypes.STRING,
