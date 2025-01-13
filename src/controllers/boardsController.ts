@@ -59,10 +59,10 @@ const getBoards = async (req: Request, res: Response) => {
         const data = await Board.findAndCountAll(whereClaus);
         res.json({
             data: [
-                ...data.rows.map((baord) => ({
-                    boardId: baord.toJSON().boardId,
-                    name: baord.toJSON().name,
-                    description: baord.toJSON().description
+                ...data.rows.map((board) => ({
+                    boardId: board.toJSON().boardId,
+                    name: board.toJSON().name,
+                    description: board.toJSON().description
                 }))
             ],
             paginaiton: {
@@ -72,7 +72,7 @@ const getBoards = async (req: Request, res: Response) => {
         })
     } catch (error) {
         console.log(error)
-        res.status(500).json({ error: 'Error fetching projects' });
+        res.status(500).json({ error: 'Error fetching boards' });
     }
 }
 
@@ -103,7 +103,7 @@ const createBoard = async (req: Request, res: Response) => {
         res.status(201).json({boardId: board.toJSON().boardId});
     } catch (error) {
         console.log(error);
-        res.status(500).json({ erorr: 'Error creating project' });
+        res.status(500).json({ erorr: 'Error creating board' });
     }
 }
 
