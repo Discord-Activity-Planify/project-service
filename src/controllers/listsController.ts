@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { List } from '../db/models/Board/List/List';
+import { broadcastUpdate } from '../sse/sse';
 
 // /api/v1/projects/:projectId/boards/:boardId/lists/:listId
 // get
@@ -106,6 +107,14 @@ const createList = async (req: Request, res: Response) => {
         if (!list || !list.toJSON().listId) {
             throw new Error('Failed to create list');
         }
+
+        await broadcastUpdate("list:created", {
+            type: "list:created",
+            projectId: projectId,
+            boardId: boardId,
+            listId: list.toJSON().listId,
+            name: name
+        });
         
         res.status(201).json({listId: list.toJSON().listId});
     } catch (error) {
@@ -129,6 +138,13 @@ const editList = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId) }
             });
             if (data) {
+                await broadcastUpdate("list:updated", {
+                    type: "list:updated",
+                    projectId: projectId,
+                    boardId: boardId,
+                    listId: parseInt(listId),
+                    name: name
+                });
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'List not found' });
@@ -151,6 +167,12 @@ const deleteList = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId), boardId: parseInt(boardId), listId: parseInt(listId) }
             });
             if (data) {
+                await broadcastUpdate("list:deleted", {
+                    type: "list:deleted",
+                    projectId: projectId,
+                    boardId: boardId,
+                    listId: parseInt(listId)
+                });
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'List not found' });

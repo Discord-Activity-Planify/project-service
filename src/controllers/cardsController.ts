@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { File } from '../db/models/Board/List/Card/File';
 import { Assign } from '../db/models/Board/List/Card/Assign';
 import { Acknowledgement } from '../db/models/Board/List/Card/Acknowledgement';
+import { broadcastUpdate } from '../sse/sse';
 
 // /api/v1/projects/:projectId/boards/:boardId/lists/:listId/cards/:cardId
 // get
@@ -272,6 +273,15 @@ const createCard = async (req: Request, res: Response) => {
         // Commit transaction
         await t.commit();
 
+        await broadcastUpdate('card:created', {
+            type: 'card:created',
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: card.toJSON().cardId,
+            name: name
+        });
+
         res.status(201).json({ cardId: card.toJSON().cardId });
     } catch (error) {
         // Rollback transaction in case of error
@@ -426,6 +436,15 @@ const editCard = async (req: Request, res: Response) => {
         // Commit the transaction
         await t.commit();
 
+        await broadcastUpdate("card:updated", {
+            type: "card:updated",
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: parseInt(cardId),
+            name: name,
+        });
+
         res.status(200).json({ success: true });
     } catch (error) {
         // Rollback in case of error
@@ -460,6 +479,15 @@ const updateOrder = async (req: Request, res: Response) => {
             { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true } }
         );
 
+        await broadcastUpdate("card:updated", {
+            type: "card:updated",
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: parseInt(cardId),
+            name: card.toJSON().name,
+        });
+
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Error updating order:", error);
@@ -492,6 +520,14 @@ const updateReminderInterval = async (req: Request, res: Response) => {
             { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true } }
         );
 
+        await broadcastUpdate("card:updated", {
+            type: "card:updated",
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: parseInt(cardId),
+            name: card.toJSON().name,
+        });
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Error updating reminderDaysInterval:", error);
@@ -540,6 +576,14 @@ const updateAcknowledgements = async (req: Request, res: Response) => {
         }
 
         await t.commit();
+        await broadcastUpdate("card:updated", {
+            type: "card:updated",
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: parseInt(cardId),
+            name: card.toJSON().name,
+        });
         res.status(200).json({ success: true });
     } catch (error) {
         await t.rollback();
@@ -587,6 +631,14 @@ const deleteCard = async (req: Request, res: Response) => {
                 },
             }
         );
+
+        await broadcastUpdate("card:deleted", {
+            type: "card:deleted",
+            projectId: parseInt(projectId),
+            boardId: parseInt(boardId),
+            listId: parseInt(listId),
+            cardId: parseInt(cardId),
+        });
 
         res.status(200).json({ success: true });
     } catch (error) {
