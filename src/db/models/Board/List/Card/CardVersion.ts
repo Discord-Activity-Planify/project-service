@@ -37,7 +37,7 @@ export const CardVersion = sequelize.define(
         endDate: {
             type: DataTypes.DATE,
         },
-        verisonDate: {
+        versionDate: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW
         },

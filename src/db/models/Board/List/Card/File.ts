@@ -15,11 +15,11 @@ export const File = sequelize.define(
         },
         cardId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            primaryKey: true
         },
         versionNumber: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            primaryKey: true
         }
     },
     {
