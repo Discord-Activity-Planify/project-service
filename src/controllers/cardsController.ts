@@ -446,10 +446,20 @@ const updateOrder = async (req: Request, res: Response) => {
     }
 
     try {
+        const card = await Card.findOne({
+            where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true },
+        });
+
+        if (!card) {
+            res.status(404).json({ error: "Card not found" });
+            return;
+        }
+
         await Card.update(
             { order },
-            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId) } }
+            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true } }
         );
+
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Error updating order:", error);
@@ -468,10 +478,20 @@ const updateReminderInterval = async (req: Request, res: Response) => {
     }
 
     try {
+        const card = await Card.findOne({
+            where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true },
+        });
+
+        if (!card) {
+            res.status(404).json({ error: "Card not found" });
+            return;
+        }
+
         await Card.update(
             { reminderDaysInterval },
-            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId) } }
+            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true } }
         );
+
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Error updating reminderDaysInterval:", error);
@@ -492,6 +512,16 @@ const updateAcknowledgements = async (req: Request, res: Response) => {
     const t = await sequelize.transaction();
 
     try {
+        const card = await Card.findOne({
+            where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true },
+        });
+
+        if (!card) {
+            await t.rollback();
+            res.status(404).json({ error: "Card not found" });
+            return;
+        }
+
         for (const ack of acknowledgements) {
             const { userId, isAcknowledged } = ack;
             if (userId === undefined || isAcknowledged === undefined) {
