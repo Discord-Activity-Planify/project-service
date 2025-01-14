@@ -9,7 +9,7 @@ export const Acknowledgement = sequelize.define(
             primaryKey: true
         },
         userId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             primaryKey: true
         },
         isAcknowledged: {
