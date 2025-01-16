@@ -52,7 +52,10 @@ export const Card = sequelize.define(
         order: {
             type: DataTypes.INTEGER,
             allowNull: false
-        }
+        },
+        lastReminderDate: {
+            type: DataTypes.DATE,
+        },
     },
     {
         timestamps: false
