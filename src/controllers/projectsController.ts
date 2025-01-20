@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Project } from '../db/models/Project';
 import { sequelize } from '../db/database';
 import { AccessProject } from '../db/models/AccessProject';
+import { broadcastUpdate } from '../sse/sse';
 
 // /api/v1/projects/:projectId
 // get
@@ -126,6 +127,12 @@ const createProject = async (req: Request, res: Response) => {
             {transaction: t}
         )
 
+        await broadcastUpdate("project:created", {
+            type: "project:created",
+            projectId: project.toJSON().projectId,
+            name: project.toJSON().name,
+        })
+
         await t.commit();
         
         res.status(201).json({projectId: project.toJSON().projectId});
@@ -147,6 +154,11 @@ const editProject = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId) }
             });
             if (data) {
+                await broadcastUpdate("project:updated", {
+                    type: "project:updated",
+                    projectId: parseInt(projectId),
+                    name: name,
+                })
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'Project not found' });
@@ -169,6 +181,10 @@ const deleteProject = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId) }
             });
             if (data) {
+                await broadcastUpdate("project:deleted", {
+                    type: "project:deleted",
+                    projectId: parseInt(projectId)
+                })
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'Project not found' });

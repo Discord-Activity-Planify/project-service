@@ -12,7 +12,7 @@ const router = express.Router()
 router.use("/:projectId/boards", authorizeProjectAccess, boardsApi)
 router.use("/:projectId/boards/:boardId/lists", authorizeProjectAccess, listsApi)
 router.use("/:projectId/boards/:boardId/lists/:listId/cards", authorizeProjectAccess, cardsApi)
-router.use("/:projectId/boards/:boardId/lists/:listId/cards/:cardId/histories", authorizeProjectAccess, cardHistoriesApi)
+router.use("/:projectId/boards/:boardId/cards/:cardId/histories", authorizeProjectAccess, cardHistoriesApi)
 router.use("/:projectId/members", authorizeProjectAccess, membersApi)
 router.use("/:projectId/invite", authorizeProjectAccess, invitationsApi)
 

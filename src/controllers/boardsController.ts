@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Board } from '../db/models/Board/Board';
+import { broadcastUpdate } from '../sse/sse';
 
 // /api/v1/projects/:projectId/boards/:boardId
 // get
@@ -100,6 +101,13 @@ const createBoard = async (req: Request, res: Response) => {
             throw new Error('Failed to create board');
         }
         
+        await broadcastUpdate("board:created", {
+            type: "board:created",
+            projectId: projectId,
+            boardId: board.toJSON().boardId,
+            name: name
+        });
+
         res.status(201).json({boardId: board.toJSON().boardId});
     } catch (error) {
         console.log(error);
@@ -118,6 +126,12 @@ const editBoard = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId), boardId: parseInt(boardId) }
             });
             if (data) {
+                await broadcastUpdate("board:updated", {
+                    type: "board:updated",
+                    projectId: projectId,
+                    boardId: boardId,
+                    name: name
+                });
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'Board not found' });
@@ -140,6 +154,11 @@ const deleteBoard = async (req: Request, res: Response) => {
                 where: { projectId: parseInt(projectId), boardId: parseInt(boardId) }
             });
             if (data) {
+                await broadcastUpdate("board:deleted", {
+                    type: "board:deleted",
+                    projectId: projectId,
+                    boardId: boardId,
+                });
                 res.json({ success: true });
             } else {
                 res.status(404).json({ error: 'Board not found' });
