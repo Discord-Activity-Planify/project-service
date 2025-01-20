@@ -30,7 +30,6 @@ npm install
 ---
 
 ## 3. Update the Config File
-Ensure the `config.js` file is correctly set up to read environment variables from the `.env` file.
 
 Example `config.js`:
 ```javascript
