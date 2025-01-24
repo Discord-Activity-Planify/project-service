@@ -185,7 +185,7 @@ const createCard = async (req: Request, res: Response) => {
     const { assignedTo = [], files = [] } = req.body;
     
     if (!projectId || !boardId || !listId || !name || !order) {
-        res.status(400).json({ error: 'Bad request'});
+        res.status(400).json({ error: 'Bad request: Missing required parameters or order' });
         return;
     }
     if (!dayjs(startDate).isValid() || !dayjs(endDate).isValid()) {
@@ -562,7 +562,7 @@ const updateAcknowledgements = async (req: Request, res: Response) => {
             const { userId, isAcknowledged } = ack;
             if (userId === undefined || isAcknowledged === undefined) {
                 await t.rollback();
-                res.status(400).json({ error: "Invalid acknowledgement format" });
+                res.status(400).json({ error: "Missing required parameters in acknowledgements" });
                 return;
             }
 
