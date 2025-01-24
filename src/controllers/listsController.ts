@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { List } from '../db/models/Board/List/List';
 import { broadcastUpdate } from '../sse/sse';
+import { sequelize } from '../db/database';
+import { Op } from 'sequelize';
 
 // /api/v1/projects/:projectId/boards/:boardId/lists/:listId
 // get
@@ -128,34 +130,89 @@ const createList = async (req: Request, res: Response) => {
 const editList = async (req: Request, res: Response) => {
     const { projectId, boardId, listId } = req.params;
     const { name, order } = req.body;
+
+    if (!projectId || !boardId || !listId) {
+        res.status(400).json({ error: 'Project ID, Board ID, and List ID are required' });
+        return;
+    }
+
     const fieldsToUpdate: { name?: string; order?: number } = {};
     if (name !== undefined) fieldsToUpdate.name = name;
-    if (order !== undefined) fieldsToUpdate.order = order;
 
-    if (projectId && boardId && listId) {
-        try {
-            const data = await List.update(fieldsToUpdate, {
-                where: { projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId) }
-            });
-            if (data) {
-                await broadcastUpdate("list:updated", {
-                    type: "list:updated",
-                    projectId: projectId,
-                    boardId: boardId,
-                    listId: parseInt(listId),
-                    name: name
-                });
-                res.json({ success: true });
-            } else {
-                res.status(404).json({ error: 'List not found' });
-            }
-        } catch (error) {
-            res.status(500).json({ error: 'Error editing list' });
+    const transaction = await sequelize.transaction();
+
+    try {
+        const currentList = await List.findOne({
+            where: { projectId: parseInt(projectId), boardId: parseInt(boardId), listId: parseInt(listId) },
+            transaction,
+        });
+
+        if (!currentList) {
+            await transaction.rollback();
+            res.status(404).json({ error: 'List not found' });
+            return;
         }
-    } else {
-        res.status(400).json({ error: 'Project ID and BoardId and ListId is required' });
+
+        if (order !== undefined) {
+            const currentOrder = currentList.toJSON().order;
+
+            if (currentOrder < order) {
+                // Decrease all orders between currentOrder and newOrder
+                await List.update(
+                    { order: sequelize.literal('"order" - 1') },
+                    {
+                        where: {
+                            projectId: parseInt(projectId),
+                            boardId: parseInt(boardId),
+                            order: { [Op.gt]: currentOrder, [Op.lte]: parseInt(order) },
+                        },
+                        transaction,
+                    }
+                );
+            } else if (currentOrder > order) {
+                // Increase all orders between newOrder and currentOrder
+                await List.update(
+                    { order: sequelize.literal('"order" + 1') },
+                    {
+                        where: {
+                            projectId: parseInt(projectId),
+                            boardId: parseInt(boardId),
+                            order: { [Op.gte]: parseInt(order), [Op.lt]: currentOrder },
+                        },
+                        transaction,
+                    }
+                );
+            }
+
+            fieldsToUpdate.order = order;
+        }
+
+        // Update the specific list
+        await List.update(fieldsToUpdate, {
+            where: { projectId: parseInt(projectId), boardId: parseInt(boardId), listId: parseInt(listId) },
+            transaction,
+        });
+
+        // Commit the transaction
+        await transaction.commit();
+
+        // Broadcast the update
+        await broadcastUpdate("list:updated", {
+            type: "list:updated",
+            projectId: projectId,
+            boardId: boardId,
+            listId: parseInt(listId),
+            name: name || currentList.toJSON().name,
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        // Rollback the transaction in case of an error
+        await transaction.rollback();
+        console.error("Error editing list:", error);
+        res.status(500).json({ error: 'Error editing list' });
     }
-}
+};
 
 // /api/v1/projects/:projectId/boards/:boardId/lists/:listId
 // delete

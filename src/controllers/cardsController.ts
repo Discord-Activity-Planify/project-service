@@ -7,6 +7,7 @@ import { File } from '../db/models/Board/List/Card/File';
 import { Assign } from '../db/models/Board/List/Card/Assign';
 import { Acknowledgement } from '../db/models/Board/List/Card/Acknowledgement';
 import { broadcastUpdate } from '../sse/sse';
+import { Op, Sequelize } from 'sequelize';
 
 // /api/v1/projects/:projectId/boards/:boardId/lists/:listId/cards/:cardId
 // get
@@ -111,6 +112,7 @@ const getCards = async (req: Request, res: Response) => {
             },
             attributes: ["cardId", "listId", "name", "startDate", "endDate", "styleId", "order", "versionNumber"],
             offset,
+            order: [["order", "ASC"]],
             limit: parsedLimit,
         });
 
@@ -464,6 +466,8 @@ const updateOrder = async (req: Request, res: Response) => {
         return;
     }
 
+    const t = await sequelize.transaction();
+
     try {
         const card = await Card.findOne({
             where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true },
@@ -474,10 +478,51 @@ const updateOrder = async (req: Request, res: Response) => {
             return;
         }
 
+        const orderOwner = await Card.findOne({
+            where: { projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true, order: parseInt(order) },
+        });
+
+        if (orderOwner) {
+            const currentOrder = card.toJSON().order;
+            if (currentOrder < order) {
+                // Decrease all card orders greater than the current order
+                await Card.update(
+                    { order: Sequelize.literal('"order" - 1') },
+                    {
+                        where: {
+                            projectId: parseInt(projectId),
+                            listId: parseInt(listId),
+                            boardId: parseInt(boardId),
+                            isActive: true,
+                            order: { [Op.gt]: currentOrder, [Op.lte]: parseInt(order) },
+                        },
+                        transaction: t
+                    }
+                );
+            } else {
+                // Increase all card orders greater than or equal to the new order
+                await Card.update(
+                    { order: Sequelize.literal('"order" + 1') },
+                    {
+                        where: {
+                            projectId: parseInt(projectId),
+                            listId: parseInt(listId),
+                            boardId: parseInt(boardId),
+                            isActive: true,
+                            order: { [Op.gte]: parseInt(order), [Op.lt]: currentOrder },
+                        },
+                        transaction: t
+                    }
+                );
+            }
+        }
         await Card.update(
             { order },
-            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true } }
+            { where: { cardId: parseInt(cardId), projectId: parseInt(projectId), listId: parseInt(listId), boardId: parseInt(boardId), isActive: true },
+            transaction: t }
         );
+
+        await t.commit();
 
         await broadcastUpdate("card:updated", {
             type: "card:updated",
@@ -490,6 +535,7 @@ const updateOrder = async (req: Request, res: Response) => {
 
         res.status(200).json({ success: true });
     } catch (error) {
+        await t.rollback();
         console.error("Error updating order:", error);
         res.status(500).json({ error: "Error updating order" });
     }
