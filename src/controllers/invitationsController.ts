@@ -9,7 +9,7 @@ const invite = async (req: Request, res: Response) => {
     const { userId } = req.body;
 
     if (!projectId || !userId) {
-        res.status(400).json({ error: 'Invalid input data' });
+        res.status(400).json({ error: 'Project ID and User ID is required' });
         return;
     }
 
