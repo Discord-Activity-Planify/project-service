@@ -1,7 +1,7 @@
-const { SERVER_HOST, SERVER_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT } = process.env
+const { SERVER_HOST, SERVER_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DATABASE_HOST, DATABASE_PORT, BOT_TOKEN } = process.env
 
 
-if ( SERVER_PORT === undefined || SERVER_HOST === undefined || DATABASE_USERNAME === undefined || DATABASE_PASSWORD === undefined || DATABASE_NAME === undefined || DATABASE_HOST === undefined || DATABASE_PORT === undefined) {
+if ( BOT_TOKEN === undefined || SERVER_PORT === undefined || SERVER_HOST === undefined || DATABASE_USERNAME === undefined || DATABASE_PASSWORD === undefined || DATABASE_NAME === undefined || DATABASE_HOST === undefined || DATABASE_PORT === undefined) {
     console.log('No ENV')
     process.exit(1)
 }
@@ -18,5 +18,8 @@ export default {
         name: DATABASE_NAME,
         host: DATABASE_HOST,
         port: DATABASE_PORT
+    },
+    discord: {
+        botToken: BOT_TOKEN
     }
 }
